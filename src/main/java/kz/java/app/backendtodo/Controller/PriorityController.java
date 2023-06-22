@@ -19,9 +19,9 @@ public class PriorityController {
         this.priorityRepository = priorityRepository;
     }
 
-    @GetMapping("/test")
+    @GetMapping("/all")
     public List<Priority> test(){
-        List<Priority> list = priorityRepository.findAll();
+        List<Priority> list = priorityRepository.findAllByOrderByIdAsc();
         System.out.println("list: " + list);
         return list;
     }
