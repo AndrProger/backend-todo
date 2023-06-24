@@ -1,7 +1,10 @@
 package kz.java.app.backendtodo.Controller;
 
+import kz.java.app.backendtodo.entity.Category;
 import kz.java.app.backendtodo.entity.Priority;
 import kz.java.app.backendtodo.repo.PriorityRepository;
+import kz.java.app.backendtodo.search.CategorySearchValues;
+import kz.java.app.backendtodo.search.PrioritySearchValue;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +36,8 @@ public class PriorityController {
         if(priority.getTitle()==null || priority.getTitle().trim().length()==0){
             return new ResponseEntity("missed param: title", HttpStatus.NOT_ACCEPTABLE);
         }
-        return ResponseEntity.ok(priorityRepository.save(priority));
+        priorityRepository.save(priority);
+        return new ResponseEntity(HttpStatus.OK);
     }
     @PutMapping("/update")
     public ResponseEntity<Priority> update(@RequestBody Priority priority){
@@ -46,7 +50,8 @@ public class PriorityController {
         if(priority.getTitle()==null || priority.getTitle().trim().length()==0){
             return new ResponseEntity("missed param: title", HttpStatus.NOT_ACCEPTABLE);
         }
-        return ResponseEntity.ok(priorityRepository.save(priority));
+        priorityRepository.save(priority);
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     @GetMapping("/id/{id}")
@@ -59,6 +64,11 @@ public class PriorityController {
             return new ResponseEntity("not found id:"+id, HttpStatus.NOT_FOUND);
         }
         return ResponseEntity.ok(priority);
+    }
+
+    @PostMapping("/search")
+    public ResponseEntity<List<Priority>> search(@RequestBody PrioritySearchValue prioritySearchValue){
+        return  ResponseEntity.ok(priorityRepository.findByTitle(prioritySearchValue.getText()));
     }
 
 }

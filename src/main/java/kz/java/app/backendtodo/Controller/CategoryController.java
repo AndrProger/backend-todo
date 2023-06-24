@@ -3,6 +3,7 @@ package kz.java.app.backendtodo.Controller;
 import kz.java.app.backendtodo.entity.Category;
 import kz.java.app.backendtodo.entity.Priority;
 import kz.java.app.backendtodo.repo.CategoryRepository;
+import kz.java.app.backendtodo.search.CategorySearchValues;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,10 +28,31 @@ public class CategoryController {
     }
 
     @PostMapping("/add")
-    public Category add(@RequestBody Category category){
-        return categoryRepository.save(category);
-
+    public ResponseEntity<Category> add(@RequestBody Category category){
+        if(category.getId()!=null && category.getId()!=0){
+            return new ResponseEntity("redundant param: id must be null", HttpStatus.NOT_ACCEPTABLE);
+        }
+        if(category.getTitle()==null || category.getTitle().trim().length()==0){
+            return new ResponseEntity("missed param: title", HttpStatus.NOT_ACCEPTABLE);
+        }
+        categoryRepository.save(category);
+        return new ResponseEntity(HttpStatus.OK);
     }
+    @PutMapping("/update")
+    public ResponseEntity<Category> update(@RequestBody Category category){
+        if(category.getId()==null || category.getId()==0){
+            return new ResponseEntity("missed param: id", HttpStatus.NOT_ACCEPTABLE);
+        }
+        if(!categoryRepository.existsById(category.getId())){
+            return new ResponseEntity("missed obj on db", HttpStatus.NOT_ACCEPTABLE);
+        }
+        if(category.getTitle()==null || category.getTitle().trim().length()==0){
+            return new ResponseEntity("missed param: title", HttpStatus.NOT_ACCEPTABLE);
+        }
+        categoryRepository.save(category);
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
 
     @GetMapping("/id/{id}")
     public ResponseEntity<Category> findById(@PathVariable("id") Long id){
@@ -53,6 +75,11 @@ public class CategoryController {
         } else {
             return new ResponseEntity("Category not found", HttpStatus.NOT_FOUND);
         }
+    }
+
+    @PostMapping("/search")
+    public ResponseEntity<List<Category>> search(@RequestBody CategorySearchValues categorySearchValues){
+        return  ResponseEntity.ok(categoryRepository.findByTitle(categorySearchValues.getText()));
     }
 
 }
